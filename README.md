@@ -8,9 +8,9 @@ Mediquery turns hospital discharge packets into organized clinical records you c
 
 ## What it does
 
-1. **Intake** — ingest a discharge packet (mock PDF upload or demo templates)
+1. **Intake** — upload a PDF for deterministic ETL, or use demo templates (mock parser)
 2. **Records** — browse parsed sections (medications, allergies, labs, wound care, etc.)
-3. **Ask** — query all ingested data via LLM with source citations
+3. **Ask** — query ingested data via OpenAI LLM with source citations (API key required)
 
 ## Quick start
 
@@ -21,15 +21,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Optional: LLM
+### LLM Ask (recommended)
 
 ```bash
 cp .env.example .env.local
-# Set OPENAI_API_KEY
+# OPENAI_API_KEY=sk-...
 npm run dev
 ```
 
-Without an API key, Ask uses keyword-based fallback answers.
+Without `OPENAI_API_KEY`, Ask uses keyword fallback. **Intake parsing does not use the LLM** — it is deterministic regex/heuristic ETL.
+
+### Try real PDF intake
+
+Upload `samples/Branson_Harold_Discharge_2026-06-17_MESSY.pdf` on `/intake` → **Extract & Ingest**.
 
 ## Scripts
 
@@ -46,7 +50,7 @@ Without an API key, Ask uses keyword-based fallback answers.
 
 | Route | Purpose |
 |-------|---------|
-| `/intake` | Ingest discharge packet |
+| `/intake` | Upload PDF (ETL) or ingest demo template |
 | `/dashboard` | Browse ingested records |
 | `/patients/[id]` | Organized record detail |
 | `/ask` | LLM queries across all records |
@@ -63,14 +67,15 @@ Five prepopulated patients ship with the app. Reset by clearing `jot-snf-workspa
 | James Cooper | Missing therapy orders |
 | Linda Park | Incomplete insurance auth |
 
-See **[DEMO.md](./DEMO.md)** for walkthrough scripts.
+See **[DEMO.md](./DEMO.md)** for walkthrough scripts. See **[STORIES.md](./STORIES.md)** for the latest development story.
 
 ## Stack
 
 - Next.js 15 (App Router) · React 19 · TypeScript
-- Mock parser (`src/services/dischargeParser.ts`) — deterministic demo parsing
+- PDF text extraction (`pdfjs-dist`) + deterministic ETL (`src/services/dischargeEtl.ts`)
+- Mock parser for demo templates (`src/services/dischargeParser.ts`)
 - localStorage store (`src/services/patientStore.ts`)
-- OpenAI chat API with RAG context (`src/services/llmAgent.ts`)
+- OpenAI chat API with RAG context (`src/services/llmAgent.ts`) — Ask only; requires API key
 
 ## Out of scope
 

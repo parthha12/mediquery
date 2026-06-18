@@ -60,6 +60,10 @@ export function ingestAndParse(
   return addWorkspace(workspace);
 }
 
+export function ingestWorkspace(workspace: PatientWorkspace): PatientWorkspace {
+  return addWorkspace(workspace);
+}
+
 export function addStaffNote(
   patientId: string,
   text: string,
