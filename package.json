@@ -1,0 +1,27 @@
+{
+  "name": "mediquery",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mediquery — ingest, organize, and query discharge data",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --import ./tests/loader.mjs --test 'tests/test-*.mjs'",
+    "verify": "npm test && npm run typecheck && npm run build",
+    "verify:live": "npm run verify && node --experimental-strip-types scripts/smoke-api.mjs"
+  },
+  "dependencies": {
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "typescript": "^5.8.3"
+  }
+}
