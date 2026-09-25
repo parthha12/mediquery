@@ -1,10 +1,24 @@
 # Stories
 
-Development log for Mediquery. Latest first.
+Development log for MediQuery. Latest first.
 
 ---
 
-## Story 3 — Real PDF ETL + LLM Ask (current)
+## Story 4 — Product spec from pitch (current)
+
+**Status:** Docs landed · App still single-packet prototype
+
+Pitch-deck PRD is now in **[docs/PRD.md](./docs/PRD.md)**.
+
+**Wedge:** patient-anchored medication reconciliation at home-health intake (hospital → SNF → home), not a facility-owned chart. Families are the free distribution layer; agencies pay for the operating workflow.
+
+**What changed in-repo:** README / DEMO / Ask copy aligned to that north star. Gap table in the PRD states what this prototype already does (PDF ETL, section flags, cited Ask) vs what the investor demo still needs (multi-source compare, `MedicationEvent` timeline, human resolution).
+
+**Next build:** close the Margaret demo — several contradictory sources → current list + conflicts + evidence spans → nurse resolution.
+
+---
+
+## Story 3 — Real PDF ETL + LLM Ask
 
 **Status:** Done (parser) · LLM Ask requires API key
 

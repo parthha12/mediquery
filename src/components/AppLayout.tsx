@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 import { SafetyBanner } from './SafetyBanner';
 
 const NAV_ITEMS = [
+  { href: '/', label: 'Home', match: (path: string) => path === '/' },
+  { href: '/dashboard', label: 'Board', match: (path: string) => path === '/dashboard' || path.startsWith('/patients') },
   { href: '/intake', label: 'Intake', match: (path: string) => path.startsWith('/intake') },
-  { href: '/dashboard', label: 'Records', match: (path: string) => path === '/dashboard' || path.startsWith('/patients') },
   { href: '/ask', label: 'Ask', match: (path: string) => path.startsWith('/ask') },
 ];
 
@@ -16,8 +17,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <Link href="/dashboard" className="app-brand" style={{ textDecoration: 'none' }}>
-          <span className="app-brand-title">Mediquery</span>
+        <Link href="/" className="app-brand">
+          <span className="app-mark" aria-hidden="true">M</span>
+          <span className="app-brand-title">MediQuery</span>
         </Link>
         <nav className="app-nav" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => (
@@ -31,7 +33,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
       </header>
-      <main className="app-main">
+      <main className="app-main mq-wide">
         <SafetyBanner />
         {children}
       </main>

@@ -7,14 +7,15 @@ import {
   resolveReferences,
 } from './ragContext';
 
-const SYSTEM_PROMPT = `You are Mediquery, an AI assistant for exploring organized discharge packet data.
+const SYSTEM_PROMPT = `You are MediQuery, an evidence-first assistant for medication and transition records.
 
 Rules:
 - Answer ONLY from the provided patient/workspace context. If information is missing, say so clearly.
 - Always cite source sections by their section_id values in your response.
+- Prefer source-traced facts over recommendations. Show conflicting sources side by side; do not pick a winner.
 - Flag conflicts, missing sections, or items needing human review when relevant.
-- Be concise and practical — staff need actionable answers, not essays.
-- Never provide definitive medical advice. Remind users that human review is required.
+- Be concise and practical — intake staff need actionable answers, not essays.
+- Never provide definitive medical advice or autonomous clinical decisions. Human review is required.
 - When comparing across patients (ingest mode), organize answers clearly by patient.`;
 
 interface LlmJsonResponse {
@@ -138,7 +139,12 @@ function generateIngestFallback(workspaces: PatientWorkspace[], question: string
     };
   }
 
-  if (lower.includes('review') || lower.includes('flag') || lower.includes('conflict')) {
+  if (lower.includes('review') || lower.includes('flag') || lower.includes('conflict') || lower.includes('medication')) {
+    const reconLines = workspaces.flatMap((w) =>
+      (w.reconciliation?.conflicts ?? [])
+        .filter((c) => !c.resolution)
+        .map((c) => `- **${w.patient.name}** — ${c.medicationNameNormalized}: ${c.summary}`)
+    );
     const flagged = workspaces.flatMap((w) =>
       w.sections
         .filter((s) => s.status !== 'complete' || (s.flags?.length ?? 0) > 0)
@@ -147,6 +153,12 @@ function generateIngestFallback(workspaces: PatientWorkspace[], question: string
           return `- **${w.patient.name}** — ${s.title}: ${s.status}${s.flags?.length ? ` (${s.flags.join('; ')})` : ''}`;
         })
     );
+    if (reconLines.length) {
+      return {
+        answer: `Open medication conflicts (source-traced, no winner picked):\n\n${reconLines.join('\n')}\n\nOther review flags:\n\n${flagged.join('\n')}`,
+        citedSections,
+      };
+    }
     return {
       answer:
         flagged.length > 0

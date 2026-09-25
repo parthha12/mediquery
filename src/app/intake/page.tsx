@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { MOCK_PACKET_OPTIONS } from '@/services/mockPatients';
@@ -63,13 +64,21 @@ export default function IntakePage() {
   return (
     <div>
       <h1 className="page-title">Intake</h1>
+      <p className="record-meta">
+        Upload a packet, or open the seeded Margaret transition (hospital + SNF + pharmacy + referral).
+      </p>
+      <Link href="/patients/patient_margaret" className="btn" style={{ marginBottom: 18 }}>
+        Open Margaret&apos;s case
+      </Link>
 
       {step === 'select' && (
         <>
           <label className="upload-zone" htmlFor="packet-upload">
             <div className="upload-zone-title">{fileName || 'Upload PDF'}</div>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>
-              {uploadedFile ? 'PDF will be parsed and loaded via ETL' : 'Upload extracts SNF fields from your PDF'}
+              {uploadedFile
+                ? 'PDF will be parsed into a source-traced record'
+                : 'Upload a discharge packet — medications and clinical sections, with source pages'}
             </div>
             <input
               id="packet-upload"
@@ -115,7 +124,7 @@ export default function IntakePage() {
       )}
 
       {step === 'processing' && (
-        <div className="card empty-state">Extracting text and organizing SNF fields…</div>
+        <div className="card empty-state">Extracting text and organizing the record…</div>
       )}
 
       {step === 'done' && (

@@ -15,9 +15,10 @@ beforeEach(() => {
   resetToMockData();
 });
 
-test('listWorkspaces returns 5 prepopulated patients', () => {
+test('listWorkspaces returns Margaret plus 5 packet patients', () => {
   const all = listWorkspaces();
-  assert.equal(all.length, 5);
+  assert.equal(all.length, 6);
+  assert.ok(all.some((w) => w.patient.name === 'Margaret Smith'));
   assert.ok(all.some((w) => w.patient.name === 'James Cooper'));
   assert.ok(all.some((w) => w.patient.name === 'Linda Park'));
 });

@@ -27,7 +27,7 @@ test('askPatientQuestion answers wound care missing scenario', async () => {
 
 test('askIngestQuestion counts workspaces in fallback mode', async () => {
   const result = await askIngestQuestion(MOCK_WORKSPACES, 'How many patients are in the database?');
-  assert.match(result.text, /5/);
+  assert.match(result.text, /6/);
   assert.ok(result.disclaimer);
 });
 

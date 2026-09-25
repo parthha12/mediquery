@@ -80,7 +80,7 @@ export function DataExplorerChat() {
     }
   };
 
-  const suggestions = ['Who needs review?', 'Any allergy conflicts?'];
+  const suggestions = ['Who needs review?', 'Which medications conflict?', 'Any allergy conflicts?'];
 
   return (
     <div className="chat-panel card">

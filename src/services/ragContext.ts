@@ -37,6 +37,12 @@ export function buildPatientRagContext(workspace: PatientWorkspace): string {
       ? staffNotes.map((n) => `[staff_note] ${n.author}: ${n.text}`).join('\n')
       : 'No staff notes.';
 
+  const recon = workspace.reconciliation;
+  const reconBlock = recon
+    ? `RECONCILIATION: ${recon.summary.total} meds, ${recon.summary.changes} changes, ${recon.summary.unresolved} open conflicts
+${recon.conflicts.map((c) => `- ${c.medicationNameNormalized} [${c.kind}] ${c.summary}${c.resolution ? ` → ${c.resolution.kind}` : ''}`).join('\n')}`
+    : 'RECONCILIATION: not derived';
+
   return `PATIENT: ${patient.name} (MRN: ${patient.mrn}, DOB: ${patient.dob})
 ADMITTED: ${patient.admitDate}${patient.roomNumber ? ` | Room ${patient.roomNumber}` : ''}
 ATTENDING: ${patient.attendingPhysician ?? 'Not listed'}
@@ -49,7 +55,9 @@ CLINICAL SECTIONS:
 ${sectionBlocks}
 
 STAFF NOTES:
-${notesBlock}`;
+${notesBlock}
+
+${reconBlock}`;
 }
 
 export function buildIngestRagContext(workspaces: PatientWorkspace[]): string {

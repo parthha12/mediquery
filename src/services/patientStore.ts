@@ -1,17 +1,26 @@
-import type { AIAnswer, AIQuestion, PatientWorkspace, StaffNote } from '@/types';
+import type { AIAnswer, AIQuestion, HumanResolution, PatientWorkspace, StaffNote } from '@/types';
 import { MOCK_WORKSPACES } from './mockPatients';
 import { ingestDischargePacket, parseDischargePacket } from './dischargeParser';
 import type { MockPacketTemplate } from '@/types';
+import { ensureReconciliation, resolveConflict } from './reconciliation';
 
-const STORAGE_KEY = 'jot-snf-workspaces';
+const STORAGE_KEY = 'mediquery-workspaces-v2';
+const LEGACY_KEY = 'jot-snf-workspaces';
+
+function hydrate(list: PatientWorkspace[]): PatientWorkspace[] {
+  const withRecon = list.map(ensureReconciliation);
+  if (withRecon.some((w) => w.patient.id === 'patient_margaret')) return withRecon;
+  const margaret = MOCK_WORKSPACES.find((w) => w.patient.id === 'patient_margaret');
+  return margaret ? [margaret, ...withRecon] : withRecon;
+}
 
 function loadFromStorage(): PatientWorkspace[] {
   if (typeof window === 'undefined') return [...MOCK_WORKSPACES];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_KEY);
     if (!raw) return [...MOCK_WORKSPACES];
     const parsed = JSON.parse(raw) as PatientWorkspace[];
-    return parsed.length ? parsed : [...MOCK_WORKSPACES];
+    return parsed.length ? hydrate(parsed) : [...MOCK_WORKSPACES];
   } catch {
     return [...MOCK_WORKSPACES];
   }
@@ -41,6 +50,7 @@ export function getWorkspace(patientId: string): PatientWorkspace | undefined {
 
 export function addWorkspace(workspace: PatientWorkspace): PatientWorkspace {
   refresh();
+  workspace = ensureReconciliation(workspace);
   const existing = workspaces.findIndex((w) => w.patient.id === workspace.patient.id);
   if (existing >= 0) {
     workspaces[existing] = workspace;
@@ -61,7 +71,17 @@ export function ingestAndParse(
 }
 
 export function ingestWorkspace(workspace: PatientWorkspace): PatientWorkspace {
-  return addWorkspace(workspace);
+  return addWorkspace(ensureReconciliation(workspace));
+}
+
+export function resolveMedicationConflict(
+  patientId: string,
+  conflictId: string,
+  resolution: HumanResolution
+): PatientWorkspace | undefined {
+  const ws = getWorkspace(patientId);
+  if (!ws) return undefined;
+  return addWorkspace(resolveConflict(ws, conflictId, resolution));
 }
 
 export function addStaffNote(
@@ -223,7 +243,9 @@ export function searchWorkspaces(query: string): PatientWorkspace[] {
     (w) =>
       w.patient.name.toLowerCase().includes(q) ||
       w.patient.mrn.toLowerCase().includes(q) ||
-      w.sections.some((s) => s.content.toLowerCase().includes(q) || s.title.toLowerCase().includes(q))
+      w.sections.some((s) => s.content.toLowerCase().includes(q) || s.title.toLowerCase().includes(q)) ||
+      w.reconciliation?.medications.some((m) => m.name.toLowerCase().includes(q)) ||
+      w.reconciliation?.conflicts.some((c) => c.medicationNameNormalized.includes(q))
   );
 }
 

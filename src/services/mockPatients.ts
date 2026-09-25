@@ -5,6 +5,8 @@ import {
   createSourceDocuments,
   extractPatientOverview,
 } from './dischargeParser';
+import { buildMargaretWorkspace } from './margaretCase';
+import { ensureReconciliation } from './reconciliation';
 
 function seedChatHistory(
   workspace: PatientWorkspace,
@@ -103,6 +105,7 @@ function buildMockWorkspace(
 }
 
 export const MOCK_WORKSPACES: PatientWorkspace[] = [
+  buildMargaretWorkspace(),
   buildMockWorkspace(
     'complete',
     'patient_whitfield',
@@ -245,7 +248,7 @@ export const MOCK_WORKSPACES: PatientWorkspace[] = [
       ],
     }
   ),
-];
+].map(ensureReconciliation);
 
 export const MOCK_PACKET_OPTIONS = [
   {

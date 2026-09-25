@@ -2,10 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { MOCK_WORKSPACES, MOCK_PACKET_OPTIONS } from '../src/services/mockPatients.ts';
 
-test('MOCK_WORKSPACES has 5 patients with expected scenarios', () => {
-  assert.equal(MOCK_WORKSPACES.length, 5);
+test('MOCK_WORKSPACES includes Margaret plus the five packet scenarios', () => {
+  assert.equal(MOCK_WORKSPACES.length, 6);
   const names = MOCK_WORKSPACES.map((w) => w.patient.name);
   assert.deepEqual(names, [
+    'Margaret Smith',
     'Eleanor Whitfield',
     'Robert Martinez',
     'Dorothy Nguyen',

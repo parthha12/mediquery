@@ -12,6 +12,8 @@ export type SectionCategory =
   | 'source_documents'
   | 'staff_notes';
 
+import type { PatientJourneyStop, Reconciliation } from './reconciliation';
+
 export type ReviewStatus = 'complete' | 'needs_review' | 'human_review_required' | 'ai_suggested' | 'missing';
 
 export interface Patient {
@@ -22,6 +24,9 @@ export interface Patient {
   admitDate: string;
   roomNumber?: string;
   attendingPhysician?: string;
+  sourceFacility?: string;
+  destinationAgency?: string;
+  journey?: PatientJourneyStop[];
 }
 
 export interface DischargePacket {
@@ -98,6 +103,7 @@ export interface PatientWorkspace {
   staffNotes: StaffNote[];
   questions: AIQuestion[];
   answers: AIAnswer[];
+  reconciliation?: Reconciliation;
 }
 
 export interface IngestJob {
@@ -116,6 +122,21 @@ export type MockPacketTemplate =
   | 'conflicting_meds'
   | 'missing_therapy'
   | 'incomplete_insurance';
+
+export type {
+  ConflictKind,
+  HumanResolution,
+  MedicationAction,
+  MedicationConflict,
+  MedicationEvent,
+  PatientJourneyStop,
+  ReconMedStatus,
+  Reconciliation,
+  ReconciliationSummary,
+  ReconciledMedication,
+  ResolutionKind,
+  SourceKind,
+} from './reconciliation';
 
 export const SECTION_LABELS: Record<SectionCategory, string> = {
   overview: 'Overview',

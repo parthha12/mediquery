@@ -3,7 +3,7 @@ import type { ReviewStatus } from '@/types';
 export function SafetyBanner() {
   return (
     <div className="safety-banner" role="status" aria-label="Safety notice">
-      Prototype · Human review required
+      Prototype · Human review required · Not clinical advice
     </div>
   );
 }
